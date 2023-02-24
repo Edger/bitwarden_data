@@ -29,11 +29,11 @@
   </LayoutEmpty>
 </template>
 <script setup>
-import { ref, computed } from "vue";
-import { useDataStore } from "../stores/data";
 import { throttle } from "throttle-debounce";
-import LayoutEmpty from "../components/LayoutEmpty.vue";
+import { computed, ref } from "vue";
 import DuplicateList from "../components/DuplicateList.vue";
+import LayoutEmpty from "../components/LayoutEmpty.vue";
+import { useDataStore } from "../stores/data";
 
 const correction = 100; // 修正值，滚动到距离边缘多少px时触发
 
@@ -52,12 +52,25 @@ const uriData = computed(() => {
       item.login.uris.forEach((i) => {
         // 这里找 uri 相同 并且 username 相同的数据
         const exits = total.findIndex(
-          (that) => that.uri === i.uri && that.username === item.login.username
+          (that) => {
+            try {
+              let thisURL = new URL(i.uri);
+              let thatURL = new URL(that.uri);
+
+              return (thisURL.hostname === thatURL.hostname || (that.name === item.name || that.name.indexOf(item.name) != -1 || item.name.indexOf(that.name) != -1)) && that.username === item.login.username
+            } catch (e) {
+              console.log(e, i.uri, that.uri);
+            } finally {
+              console.log("run finally")
+              return (that.uri === i.uri || (that.name === item.name || that.name.indexOf(item.name) != -1 || item.name.indexOf(that.name) != -1)) && that.username === item.login.username
+            }
+          }
         );
-        if (exits >= 0) {
+        if (exits >= 0 && total[exits].ids.indexOf(item.id) === -1) {
           total[exits].ids.push(item.id);
         } else {
           total.push({
+            name: item.name,
             uri: i.uri,
             username: item.login.username,
             ids: [item.id],

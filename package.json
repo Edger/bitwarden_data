@@ -9,6 +9,7 @@
     "lint": "eslint . --ext .vue,.js,.jsx,.cjs,.mjs --fix --ignore-path .gitignore"
   },
   "dependencies": {
+    "install": "^0.13.0",
     "pinia": "^2.0.28",
     "simplebar-vue": "^1.8.0-alpha.0",
     "throttle-debounce": "^5.0.0",
